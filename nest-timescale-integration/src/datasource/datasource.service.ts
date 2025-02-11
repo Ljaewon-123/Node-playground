@@ -1,6 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
+// 하이퍼테이블 만드는것도 추가해야할지??
+/** 
+  SELECT * 
+  FROM timescaledb_information.hypertables 
+  WHERE hypertable_name = 'user';
+*/
+
+
 @Injectable()
 export class DatasourceService {
 
