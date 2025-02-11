@@ -15,32 +15,12 @@ export const dataSource = new DataSource({
   migrations: ['dist/migrations/*.js'],
 })
 
-
-// PostgreSQL 연결 설정
-const client = new Client({
-  host: 'localhost', // PostgreSQL 호스트
-  port: 5433,        // PostgreSQL 포트
-  user: 'postgres', // PostgreSQL 사용자명
-  password: 'password', // PostgreSQL 비밀번호
-  database: 'tutorials', // PostgreSQL 데이터베이스명
-});
-
-let isConnected = false;
-
-export async function connectClient() {
-  if (!isConnected) {
-    await client.connect();
-    isConnected = true;
-    console.log("Client connected to PostgreSQL");
-  }
+export async function connectDataSource() {
+  dataSource.initialize()
 }
 
-export async function disconnectClient() {
-  if (isConnected) {
-    await client.end();
-    isConnected = false;
-    console.log("Client disconnected from PostgreSQL");
-  }
+export async function disconnectDataSource() {
+  dataSource.destroy()
 }
 
 export async function coinbaseView() {
