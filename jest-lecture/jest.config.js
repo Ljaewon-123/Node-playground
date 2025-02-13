@@ -4,4 +4,8 @@ export default {
   transform: {
     "^.+.tsx?$": ["ts-jest",{}],
   },
+  rootDir: 'src',
+  setupFilesAfterEnv: ['testSetup.js']
 };
+
+// npx jest
