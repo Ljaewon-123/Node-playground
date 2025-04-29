@@ -1,10 +1,11 @@
-const express = require('express')
+import express from 'express';
+import mqtt from "mqtt";
+import cron from "node-cron";
+
 const app = express()
 const port = 3001
 
-const mqtt = require("mqtt");
 const client = mqtt.connect("mqtt://localhost:1883");
-const cron = require("node-cron");
 
 // 서버 재시작시 가질려면 kv에 저장해야한다. 
 const timer = {
@@ -21,7 +22,7 @@ Object.seal(timer)
 
 
 const timerProxy = new Proxy(timer, {
-  set(target, prop, value) {
+  set(target:any, prop, value) {
     if ((prop === 'start' || prop === 'end') && value !== null && !(value instanceof Date)) {
       throw new TypeError(`${prop}는 Date 인스턴스여야 합니다.`)
     }
@@ -39,7 +40,6 @@ const timerProxy = new Proxy(timer, {
   }
 })
 
-
 client.on("connect", () => {
   console.log("🔗 MQTT 클라이언트 연결됨");
   timerProxy.end = new Date()
@@ -55,8 +55,10 @@ client.on('message', (topic, message) => {
 });
 
 client.on('offline', () => {
+  timerProxy.reset()
   timerProxy.start = new Date()
   console.log('📴 클라이언트가 오프라인 상태입니다 (offline)');
+  // 받는 쪽에서 실행을 해줘야 하는데 람다가 제격이지 않나?
 });
 
 cron.schedule('* * * * * *', async () => {
