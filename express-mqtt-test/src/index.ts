@@ -99,7 +99,7 @@ const backupCloudDatabase = async () => {
 async function testSomeLambda() {
   // The following example invokes version 1 of a function named my-function with an empty event payload.
   const input = {
-    FunctionName: "insert-rds",
+    FunctionName: "test-rds-connection",
     Payload: "{}",
     // Qualifier: "1"
   };
