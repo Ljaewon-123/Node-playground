@@ -1,17 +1,13 @@
-import express from 'express';
-
-const app = express()
-const port = 3001
+import { ok } from './fallback-result'
+// express같은 프레임 워크일 필요는 없는거 같은데? 
 
 
-app.get('/', async (req, res) => {
-  res.send('Hello World!')
-})
+export const handler = async (event: any) => {
 
-app.get('/end', (req, res) => {
-  res.send('Client disconnected')
-})
+  const response = {
+    statusCode: 200,
+    body: JSON.stringify('Hello from Lambda!')
+  }
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  return ok(response)
+}
