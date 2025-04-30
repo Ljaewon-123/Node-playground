@@ -9,7 +9,7 @@ import {
 
 export interface Database {
   accumulated: AccumulatedTable
-  etcDevice: DeviceEtcTable
+  etc: EtcTable
 }
 
 export interface AccumulatedTable {
@@ -26,7 +26,7 @@ export type Accumulated = Selectable<AccumulatedTable>
 export type NewAccumulated = Insertable<AccumulatedTable>
 export type AccumulatedUpdate = Updateable<AccumulatedTable>
 
-export interface DeviceEtcTable {
+export interface EtcTable {
   seq_id: Generated<number>
   plc_date: Date
   site_id: number
@@ -38,6 +38,6 @@ export interface DeviceEtcTable {
   room_no: number
 }
 
-export type DeviceEtc = Selectable<DeviceEtcTable>
-export type NewDeviceEtc = Insertable<DeviceEtcTable>
-export type DeviceEtcUpdate = Updateable<DeviceEtcTable>
+export type DeviceEtc = Selectable<EtcTable>
+export type NewDeviceEtc = Insertable<EtcTable>
+export type DeviceEtcUpdate = Updateable<EtcTable>

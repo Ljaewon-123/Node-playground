@@ -2,6 +2,9 @@ import express from 'express';
 import mqtt from "mqtt";
 import cron from "node-cron";
 import { db } from './database';
+import { InvokeCommand } from "@aws-sdk/client-lambda";
+import { client as LambdaClient } from './client'
+import { ok, err } from './fallback-result'
 
 const app = express()
 const port = 3001
@@ -70,11 +73,11 @@ cron.schedule('* * * * * *', async () => {
     backupCloudDatabase()
   }
 
-  // test를 위한 예시 동작임 
-  console.log('timescaleDB 동기화 작업 하면됨 여기서 어떤 조건?', db)
-  // 여기서 삽입을 하다가 끊기고 다시 동작 하면 backup에서 람다로 전송이 필요함 
-  insertAccumulatedData()
-  insertEtcDeviceData()
+  // // test를 위한 예시 동작임 
+  // console.log('timescaleDB 동기화 작업 하면됨 여기서 어떤 조건?', db)
+  // // 여기서 삽입을 하다가 끊기고 다시 동작 하면 backup에서 람다로 전송이 필요함 
+  // insertAccumulatedData()
+  // insertEtcDeviceData()
 });
 
 // 꺼내서 람다로 보냄 
@@ -87,22 +90,28 @@ const backupCloudDatabase = async () => {
   }
   
   const [accumulated, etcDevice] = result.data;
+
+  const hitLambda = async() => {
+    
+  }
 }
 
-app.get('/', (req, res) => {
-  client.publish("presence", "Hello")
-  res.send('Hello World!')
-})
+async function testSomeLambda() {
+  // The following example invokes version 1 of a function named my-function with an empty event payload.
+  const input = {
+    FunctionName: "insert-rds",
+    Payload: "{}",
+    // Qualifier: "1"
+  };
+  const command = new InvokeCommand(input);
+  const { Payload, LogResult } = await LambdaClient.send(command);
+  const resultStr = Payload
+    ? Buffer.from(Payload).toString("utf-8")
+    : null;
 
-app.get('/end', (req, res) => {
-  client.end();
-  res.send('Client disconnected')
-})
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
-
+  const result = resultStr ? JSON.parse(resultStr) : null;
+  return { result };
+}
 
 async function insertAccumulatedData() {
   await db.insertInto('accumulated')
@@ -118,7 +127,7 @@ async function insertAccumulatedData() {
 }
 
 async function insertEtcDeviceData() {
-  await db.insertInto('etcDevice')
+  await db.insertInto('etc')
   .values({
     plc_date: new Date(),
     site_id: 0,
@@ -141,7 +150,7 @@ async function selectAllData() {
       .where('plc_date', '<', timerProxy.end)
       .executeTakeFirstOrThrow(),
   
-      db.selectFrom('etcDevice')
+      db.selectFrom('etc')
       .selectAll()
       .where('plc_date', '>', timerProxy.start)
       .where('plc_date', '<', timerProxy.end)
@@ -153,3 +162,18 @@ async function selectAllData() {
     return err(error)
   }
 }
+
+
+app.get('/', async (req, res) => {
+  client.publish("presence", "Hello")
+  res.send(await testSomeLambda())
+})
+
+app.get('/end', (req, res) => {
+  client.end();
+  res.send('Client disconnected')
+})
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
