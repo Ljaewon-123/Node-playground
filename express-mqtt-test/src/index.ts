@@ -3,7 +3,6 @@ import mqtt from "mqtt";
 import cron from "node-cron";
 import { db } from './database';
 import { InvokeCommand } from "@aws-sdk/client-lambda";
-import { client as LambdaClient } from './client'
 import { ok, err } from './fallback-result'
 
 const app = express()
@@ -91,26 +90,9 @@ const backupCloudDatabase = async () => {
   
   const [accumulated, etcDevice] = result.data;
 
-  const hitLambda = async() => {
+  const hitQuerying = async() => {
     
   }
-}
-
-async function testSomeLambda() {
-  // The following example invokes version 1 of a function named my-function with an empty event payload.
-  const input = {
-    FunctionName: "test-rds-connection",
-    Payload: "{}",
-    // Qualifier: "1"
-  };
-  const command = new InvokeCommand(input);
-  const { Payload, LogResult } = await LambdaClient.send(command);
-  const resultStr = Payload
-    ? Buffer.from(Payload).toString("utf-8")
-    : null;
-
-  const result = resultStr ? JSON.parse(resultStr) : null;
-  return { result };
 }
 
 async function insertAccumulatedData() {
@@ -166,7 +148,7 @@ async function selectAllData() {
 
 app.get('/', async (req, res) => {
   client.publish("presence", "Hello")
-  res.send(await testSomeLambda())
+  res.send({ message: "Hello Wolrd!" })
 })
 
 app.get('/end', (req, res) => {
