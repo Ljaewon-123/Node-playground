@@ -12,7 +12,7 @@ const client = mqtt.connect("mqtt://localhost:1883");
 
 let cnt = 0
 
-// 서버 재시작시 가질려면 kv에 저장해야한다. 
+// 서버 재시작시 가질려면 kv에 저장해야한다. json도 뭐 괜춘 
 const timer = {
   start: null,
   end: null,
@@ -68,15 +68,15 @@ client.on('offline', () => {
 
 cron.schedule('* * * * * *', async () => {
   if(timerProxy.done) {
-    timer.reset()
-    backupCloudDatabase()
+    await backupCloudDatabase()
+    timerProxy.reset()
   }
 
   // // test를 위한 예시 동작임 
   // console.log('timescaleDB 동기화 작업 하면됨 여기서 어떤 조건?', db)
   // // 여기서 삽입을 하다가 끊기고 다시 동작 하면 backup에서 람다로 전송이 필요함 
-  // insertAccumulatedData()
-  // insertEtcDeviceData()
+  insertAccumulatedData()
+  insertEtcDeviceData()
 });
 
 // 꺼내서 람다로 보냄 
@@ -91,8 +91,13 @@ const backupCloudDatabase = async () => {
   const [accumulated, etcDevice] = result.data;
 
   const hitQuerying = async() => {
-    
+    Promise.all([
+      fetch("http://localhost:3002/accumulated", { method: "POST", body: JSON.stringify(accumulated), headers: { 'Content-Type': 'application/json' }}),
+      fetch("http://localhost:3002/etcDevice", { method: "POST", body: JSON.stringify(etcDevice), headers: { 'Content-Type': 'application/json' }})
+    ])
   }
+
+  await hitQuerying()
 }
 
 async function insertAccumulatedData() {
@@ -130,17 +135,16 @@ async function selectAllData() {
       .selectAll()
       .where('plc_date', '>', timerProxy.start)
       .where('plc_date', '<', timerProxy.end)
-      .executeTakeFirstOrThrow(),
+      .execute(),
   
       db.selectFrom('etc')
       .selectAll()
       .where('plc_date', '>', timerProxy.start)
       .where('plc_date', '<', timerProxy.end)
-      .executeTakeFirstOrThrow()
+      .execute()
     ])
     return ok(result)
   } catch (error) {
-    console.error(error)
     return err(error)
   }
 }
