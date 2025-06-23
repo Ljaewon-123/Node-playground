@@ -1,11 +1,17 @@
-import { BadRequestException, Controller, Get, Param, Post, UseFilters } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Inject, Param, Logger } from '@nestjs/common';
 import { AppService } from './app.service';
 import { HttpExceptionFilter } from './http/http.filter';
 import { CatchEverythingFilter } from './catch-all/catch-all.filter';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger as WinstonLogger } from 'winston';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  private readonly nestLogger = new Logger(AppController.name);
+  constructor(
+    private readonly appService: AppService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly winstonLogger: WinstonLogger
+  ) {}
 
   @Get()
   // @UseFilters(new HttpExceptionFilter())
@@ -28,6 +34,35 @@ export class AppController {
   //   "statusCode": 400
   // }
 
+  @Get('unexpected-error')
+  // @UseFilters(new HttpExceptionFilter())
+  unexpectedError(@Param('id') id: number) {
+    return id.toFixed(2)
+  }
+
+  @Get('winston')
+  winstonError() {
+    // 둘다 모양은 똑같다. 
+    this.nestLogger.log('Creating user...');
+    this.winstonLogger.error('User creation failed', {
+      context: 'UserService',
+      error: "error.message",
+      stack: "error.stack",
+      userData: "data"
+    });
+    throw new BadRequestException()
+  }
+
+  @Get('variable')
+  variableWinstonError() {
+    // 둘다 모양은 똑같다. 
+    this.winstonLogger.debug('hello debug');
+    this.winstonLogger.log({ level: 'info', message: 'jho' });
+    this.winstonLogger.error('hello error');
+    this.winstonLogger.warn('hello warn');
+    this.winstonLogger.verbose('hello verbose');
+  }
+
   @Get('error-cause')
   errorCause(): string {
     throw new BadRequestException('Bad Request Error',
@@ -38,11 +73,6 @@ export class AppController {
     )
   }
 
-  @Get('unexpected-error')
-  // @UseFilters(new HttpExceptionFilter())
-  unexpectedError(@Param('id') id: number) {
-    return id.toFixed(2)
-  }
 
   @Get('test')
   // @UseFilters(new HttpExceptionFilter())

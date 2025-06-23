@@ -1,4 +1,4 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor, RequestTimeoutException } from '@nestjs/common';
+import { CallHandler, ExecutionContext, HttpException, Injectable, NestInterceptor, RequestTimeoutException } from '@nestjs/common';
 import { catchError, Observable, tap, throwError, TimeoutError } from 'rxjs';
 
 @Injectable()
@@ -7,7 +7,9 @@ export class LoggingInterceptor implements NestInterceptor {
     return next.handle()
       .pipe(
         catchError(err => {
-          console.log(err instanceof Error, err, 'interceptor')
+          if(!(err instanceof HttpException)) {
+            console.warn('예상 못한 예외')
+          }
           return throwError(() => err);
         }),
       )

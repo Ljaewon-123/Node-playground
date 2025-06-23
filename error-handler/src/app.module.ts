@@ -3,16 +3,20 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './logging/logging.interceptor';
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from './winston.config';
 
 @Module({
-  imports: [],
+  imports: [
+    WinstonModule.forRoot(winstonConfig),
+  ],
   controllers: [AppController],
   providers: [
     AppService,
-    // {
-    //   provide: APP_INTERCEPTOR,
-    //   useClass: LoggingInterceptor,
-    // },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
   ],
 })
 export class AppModule {}
