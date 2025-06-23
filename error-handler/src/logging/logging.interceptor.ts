@@ -1,14 +1,20 @@
-import { CallHandler, ExecutionContext, HttpException, Injectable, NestInterceptor, RequestTimeoutException } from '@nestjs/common';
+import { CallHandler, ExecutionContext, HttpException, Inject, Injectable, NestInterceptor, RequestTimeoutException } from '@nestjs/common';
+import { WINSTON_MODULE_PROVIDER, WinstonLogger } from 'nest-winston';
 import { catchError, Observable, tap, throwError, TimeoutError } from 'rxjs';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
+  constructor(
+    @Inject(WINSTON_MODULE_PROVIDER)
+    private readonly logger: WinstonLogger,
+  ) {}
+
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle()
       .pipe(
         catchError(err => {
           if(!(err instanceof HttpException)) {
-            console.warn('예상 못한 예외')
+            this.logger.error("예상못한 예외")
           }
           return throwError(() => err);
         }),
