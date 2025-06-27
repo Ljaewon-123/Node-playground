@@ -17,6 +17,7 @@ export class AppController {
   // @UseFilters(new HttpExceptionFilter())
   // @UseFilters(CatchEverythingFilter)
   getHello(): string {
+    console.log('hi nuxt')
     throw new BadRequestException('Bad Request Error')
   }
   // {
