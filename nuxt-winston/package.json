@@ -1,0 +1,20 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "^3.839.0",
+    "consola": "^3.4.2",
+    "nuxt": "^3.17.5",
+    "vue": "^3.5.17",
+    "vue-router": "^4.5.1",
+    "winston": "^3.17.0"
+  }
+}
