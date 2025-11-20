@@ -2,6 +2,7 @@ import AppLogoIcon from '@/components/app-logo-icon';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@inertiajs/react';
 
+// 자동생성인듯
 export default function AuthCardLayout({
     children,
     title,
