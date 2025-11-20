@@ -25,6 +25,8 @@ services:
       - php
 
   # PostgreSQL
+  # docker exec -it laravel_postgres psql -U laravel -d laravel
+
   postgres:
     image: postgres:17-alpine
     container_name: laravel_postgres
@@ -35,6 +37,8 @@ services:
       POSTGRES_USER: laravel
       POSTGRES_PASSWORD: secret
       PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/pgdata
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U laravel"]
       interval: 10s
@@ -42,7 +46,7 @@ services:
       retries: 5
 
   # Composer (명령어 실행용)
-  # docker-compose run --rm composer create-project laravel/react-starter-kit
+  # docker-compose run --rm composer create-project laravel/react-starter-kit # ~ src
   # 파일구조가 src(직접 만든 폴더 밑에 바로 작업 파일들이 있어야 한다 위 명령어는 자동으로 한폴더밑에 파일들을 집어넣음 아니면 끝에 [ src]로 src폴더까지 자동생성을 하게 한다.)
   composer:
     image: composer:latest
@@ -73,3 +77,6 @@ services:
     volumes:
       - ./src:/var/www/html
     working_dir: /var/www/html
+
+volumes:
+  postgres_data:
