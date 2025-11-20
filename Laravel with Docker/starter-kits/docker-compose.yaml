@@ -42,6 +42,7 @@ services:
       retries: 5
 
   # Composer (명령어 실행용)
+  # docker-compose run --rm composer create-project laravel/react-starter-kit
   composer:
     image: composer:latest
     container_name: laravel_composer
@@ -63,7 +64,7 @@ services:
       - postgres
 
   # NPM (React 개발용)
-  # docker-compose run --rm npm install -D typescript @types/react @types/react-dom
+  # docker-compose run --rm npm install
   npm:
     image: node:22-alpine
     container_name: laravel_npm
