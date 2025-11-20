@@ -43,6 +43,7 @@ services:
 
   # Composer (명령어 실행용)
   # docker-compose run --rm composer create-project laravel/react-starter-kit
+  # 파일구조가 src(직접 만든 폴더 밑에 바로 작업 파일들이 있어야 한다 위 명령어는 자동으로 한폴더밑에 파일들을 집어넣음 아니면 끝에 [ src]로 src폴더까지 자동생성을 하게 한다.)
   composer:
     image: composer:latest
     container_name: laravel_composer
