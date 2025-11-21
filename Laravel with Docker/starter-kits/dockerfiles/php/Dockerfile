@@ -37,5 +37,8 @@ RUN groupadd -g 1000 laravel && \
     useradd -u 1000 -g laravel -m laravel
 
 RUN chown -R laravel:laravel /var/www/html
-
 USER laravel
+
+# # 퍼미션 디나이 에러 
+# RUN chown -R www-data:www-data /var/www/html
+

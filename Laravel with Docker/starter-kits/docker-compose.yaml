@@ -5,8 +5,10 @@ services:
   php:
     build:
       context: .
-      dockerfile: docker/php/Dockerfile
+      dockerfile: dockerfiles/php/Dockerfile
     container_name: laravel_php
+    ports:
+      - '3000:9000'
     volumes:
       - ./src:/var/www/html
     depends_on:
@@ -20,7 +22,7 @@ services:
       - "8080:80"
     volumes:
       - ./src:/var/www/html
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - php
 
@@ -31,7 +33,7 @@ services:
     image: postgres:17-alpine
     container_name: laravel_postgres
     ports:
-      - "5433:5432"
+      - "5434:5432"
     environment:
       POSTGRES_DB: laravel
       POSTGRES_USER: laravel
@@ -59,7 +61,7 @@ services:
   artisan:
     build:
       context: .
-      dockerfile: docker/php/Dockerfile
+      dockerfile: dockerfiles/php/Dockerfile
     container_name: laravel_artisan
     volumes:
       - ./src:/var/www/html
@@ -73,10 +75,25 @@ services:
   npm:
     image: node:22-alpine
     container_name: laravel_npm
-    entrypoint: ["npm"]
+    # entrypoint: ["npm"]
+    command: sh -c "npm install && npm run dev -- --host"
     volumes:
       - ./src:/var/www/html
     working_dir: /var/www/html
+    ports:
+      - "5173:5173" 
+    depends_on:
+      - php 
+      - postgres
+
+  # docker-compose run --rm npm install
+  npm_cli:
+    image: node:22-alpine
+    container_name: laravel_npm_cli
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    entrypoint: ["npm"]
 
 volumes:
   postgres_data:
