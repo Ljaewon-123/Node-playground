@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  # PHP-FPM
+  php:
+    build:
+      context: .
+      dockerfile: dockerfiles/php/Dockerfile
+    container_name: laravel_php
+    ports:
+      - '3000:9000'
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - postgres
+
+  # Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: laravel_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+
+  # PostgreSQL
+  # docker exec -it laravel_postgres psql -U laravel -d laravel
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: laravel_postgres
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: laravel
+      POSTGRES_USER: laravel
+      POSTGRES_PASSWORD: secret
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U laravel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Composer (명령어 실행용)
+  # docker-compose run --rm composer create-project laravel/react-starter-kit # ~ src
+  # 파일구조가 src(직접 만든 폴더 밑에 바로 작업 파일들이 있어야 한다 위 명령어는 자동으로 한폴더밑에 파일들을 집어넣음 아니면 끝에 [ src]로 src폴더까지 자동생성을 하게 한다.)
+  composer:
+    image: composer:latest
+    container_name: laravel_composer
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+
+  # Artisan (명령어 실행용)
+  artisan:
+    build:
+      context: .
+      dockerfile: dockerfiles/php/Dockerfile
+    container_name: laravel_artisan
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    entrypoint: ['php', 'artisan']
+    depends_on:
+      - postgres
+
+  # NPM (React 개발용)
+  # docker-compose run --rm npm install
+  npm:
+    image: node:22-alpine
+    container_name: laravel_npm
+    # entrypoint: ["npm"]
+    command: sh -c "npm install && npm run dev -- --host"
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    ports:
+      - "5173:5173" 
+    depends_on:
+      - php 
+      - postgres
+
+  # docker-compose run --rm npm install
+  npm_cli:
+    image: node:22-alpine
+    container_name: laravel_npm_cli
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    entrypoint: ["npm"]
+
+volumes:
+  postgres_data:
