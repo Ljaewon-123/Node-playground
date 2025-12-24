@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: nestjs-db-prod
+    # restart: always # 항상 재시작
+    # env_file:
+    #   - ./.env
+    environment:
+      DB_USERNAME=my_admin
+      DB_PASSWORD=my_secure_password_123
+      DB_DATABASE=nest_prod_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    healthcheck: # DB가 완전히 준비되었는지 확인
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: nestjs-api-prod
+    # restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE}
+    depends_on:
+      db:
+        condition: service_healthy # DB가 healthy 상태일 때 실행
+
+volumes:
+  postgres_prod_data:
