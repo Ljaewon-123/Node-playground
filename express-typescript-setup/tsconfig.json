@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES6",                          
+    "module": "commonjs",                      
+    "outDir": "./dist",                        // 빌드된 파일이 저장될 경로
+    "rootDir": "./src",                        // 소스 코드 경로
+    "strict": true,                            // 엄격한 타입 검사 활성화
+    "moduleResolution": "node",                
+    "esModuleInterop": true,                   // CommonJS 모듈을 ES6 방식으로 import 가능하게 함
+    "skipLibCheck": true,                      
+    "forceConsistentCasingInFileNames": true   
+  },
+  "include": ["src/**/*"],                     // 컴파일할 포함 경로
+  "exclude": ["node_modules"]                  // 컴파일 제외 경로
+}

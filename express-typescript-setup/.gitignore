@@ -1,0 +1,16 @@
+# 의존성 패키지
+node_modules/
+
+# 빌드 결과물 (TypeScript 컴파일 후 생성됨)
+dist/
+
+# 환경 변수 (보안 중요)
+.env
+
+# 로그 파일
+*.log
+npm-debug.log*
+
+# OS 설정 파일
+.DS_Store
+Thumbs.db
