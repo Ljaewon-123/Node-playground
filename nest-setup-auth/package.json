@@ -17,7 +17,12 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "db:test:up": "docker-compose up -d test-db",
+    "db:test:down": "docker-compose stop test-db",
+    "pretest:e2e": "npm run db:test:up",
+    "test:e2e2": "cross-env NODE_ENV=test jest --config ./test/jest-e2e.json",
+    "posttest:e2e": "npm run db:test:down"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -53,6 +58,7 @@
     "@types/node": "^22.10.7",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.2",
+    "cross-env": "^10.1.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",

@@ -3,7 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request as ExpressRequest } from 'express';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthenticatedGuard } from 'src/common/guards/authenticated.guard';
-import { Roles } from 'src/common/desorators/roles.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/user/entity/user.entity';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 

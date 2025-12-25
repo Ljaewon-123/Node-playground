@@ -45,7 +45,7 @@ describe('Auth & Roles (e2e)', () => {
   // 1. 회원가입 테스트
   it('/auth/signup (POST)', async () => {
     return agent
-      .post('/user/register') // 유저 생성 경로
+      .post('/user/signup') // 유저 생성 경로
       .send({ username: 'adminuser', password: 'password123' })
       .expect(201);
   });
@@ -80,7 +80,8 @@ describe('Auth & Roles (e2e)', () => {
 
   afterAll(async () => {
     // 테스트용 유저 삭제 및 DB 정리
-    await userRepository.delete({});
+    // 방법 2: clear() 사용 (가장 추천)
+    await userRepository.clear();
     await app.close();
   });
 });

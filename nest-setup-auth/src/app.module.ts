@@ -15,6 +15,7 @@ import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
     ConfigModule.forRoot({
       isGlobal: true,
       ignoreEnvFile: process.env.NODE_ENV === 'production',
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
       cache: true,
       validate,
     }),
