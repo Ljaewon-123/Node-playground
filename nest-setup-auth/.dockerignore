@@ -1,0 +1,40 @@
+# 의존성 (빌드 시 내부에서 새로 설치하므로 제외)
+node_modules
+npm-debug.log
+
+# 빌드 결과물
+dist
+build
+
+# 환경 변수 및 비밀 정보 (보안상 매우 중요)
+.env
+.env.test
+.env.production
+.env.local
+
+# Git 관련
+.git
+.gitignore
+
+# 테스트 및 로그
+test
+coverage
+**/*.spec.ts
+**/*.test.ts
+logs
+*.log
+
+# OS 관련 불필요한 파일
+.DS_Store
+Thumbs.db
+
+# Docker 관련 파일 자체
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# 기타 설정 파일
+README.md
+LICENSE
+.prettierrc
+.eslintrc.js
