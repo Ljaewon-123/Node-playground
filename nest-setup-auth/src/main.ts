@@ -8,7 +8,7 @@ import { DataSource } from 'typeorm';
 import * as connectPgSimple from 'connect-pg-simple';
 import { ConfigService } from '@nestjs/config';
 
-const HOUR_1 = 3600000
+const HOUR_1 = 360_0000
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -25,6 +25,8 @@ async function bootstrap() {
 
   const PgSessionStore = connectPgSimple(session);
 
+  console.log('Postgres Pool exists:', !!pool); // 이게 false면 세션 저장이 안 됩니다.
+
   app.use(
     session({
       store: new PgSessionStore({
@@ -35,7 +37,12 @@ async function bootstrap() {
       secret: configService.get<string>('SESSION_SECRET') || 'DEV-secret',
       resave: false,
       saveUninitialized: false,
-      cookie: { maxAge: HOUR_1 }, // 1시간
+      cookie: { 
+        maxAge: HOUR_1,
+        httpOnly: true,
+        secure: false, // 로컬(http) 테스트 시 반드시 false여야 함
+        sameSite: 'lax', // 쿠키 전달 정책
+      },
     }),
   );
 

@@ -16,9 +16,9 @@ export class TypeOrmConnectionService implements TypeOrmOptionsFactory {
       port: this.configService.get<number>("DB_PORT"),
       username: this.configService.get<string>("DB_USERNAME"),
       password: this.configService.get<string>("DB_PASSWORD"),
-      database: this.configService.get<string>("DB_NAME"),
+      database: this.configService.get<string>("DB_DATABASE"),
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-      synchronize: false, //this.isProd ? false : true, // # timescaledb와 호환이 잘 안된다.. 
+      synchronize: this.isProd ? false : true,
       autoLoadEntities: true,
       // logging: true,
     }

@@ -1,16 +1,27 @@
-import { Injectable } from '@nestjs/common';
-import { PassportSerializer } from '@nestjs/passport';
+import { Injectable } from "@nestjs/common";
+import { PassportSerializer } from "@nestjs/passport";
+
+export interface UserResponse {
+  id: number;
+  username: string;
+  createdAt: string | Date; // ISO 문자열로 올 수도 있고 Date 객체일 수도 있음
+}
+
 
 // 사용자 정보를 세션에 저장하고(serialize), 세션에서 사용자 정보를 꺼내오는(deserialize) 로직입니다.
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
-  // 로그인 성공 시 세션에 사용자 ID 저장
-  serializeUser(user: any, done: (err: Error | null, user: any) => void): any {
-    done(null, user);
+  // 1. 로그인 성공 시: 세션에 유저의 "ID"만 저장합니다.
+  serializeUser(user: UserResponse, done: (err: Error | null, id: any) => void) {
+    console.log('Serialize:', user.id); // 로그 찍히는지 확인
+    done(null, user); 
   }
 
-  // 요청마다 세션의 정보를 바탕으로 사용자 객체 복원
-  deserializeUser(payload: any, done: (err: Error | null, payload: any) => void): any {
-    done(null, payload);
+  // 2. 이후 요청 시: 세션에 저장된 "ID"를 꺼내와서 유저를 복원합니다.
+  async deserializeUser(userId: string, done: (err: Error | null, payload: any) => void) {
+    console.log('Deserialize ID:', userId); // 로그 찍히는지 확인
+    // 여기서 원래는 userService.findOne(userId)를 하는 게 좋지만, 
+    // 우선 테스트를 위해 객체 형태로 넘깁니다.
+    done(null, { id: userId }); 
   }
 }
