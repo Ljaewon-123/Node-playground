@@ -1,13 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import session from 'express-session';
-import passport from 'passport';
+import * as session from 'express-session';
+import * as passport from 'passport';
 import { DataSource } from 'typeorm';
-import pgSession from 'connect-pg-simple';
+// import pgSession from 'connect-pg-simple';
+import * as connectPgSimple from 'connect-pg-simple';
+import { ConfigService } from '@nestjs/config';
+
+const HOUR_1 = 3600000
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const configService = app.get(ConfigService);
 
   // 1. TypeORM DataSource 가져오기
   const dataSource = app.get(DataSource);
@@ -17,17 +23,19 @@ async function bootstrap() {
   const driver = dataSource.driver as any;
   const pool = driver.master || driver.pool;
 
+  const PgSessionStore = connectPgSimple(session);
+
   app.use(
     session({
-      store: new (pgSession(session))({
-        pool: pool, // 이제 동일한 풀을 공유합니다.
+      store: new PgSessionStore({
+        pool: pool,
         tableName: 'session',
         createTableIfMissing: true,
       }),
-      secret: 'my-secret', // .env에 넣는 것을 권장
+      secret: configService.get<string>('SESSION_SECRET') || 'DEV-secret',
       resave: false,
       saveUninitialized: false,
-      cookie: { maxAge: 3600000 }, // 1시간
+      cookie: { maxAge: HOUR_1 }, // 1시간
     }),
   );
 
