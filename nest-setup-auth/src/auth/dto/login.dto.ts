@@ -1,0 +1,12 @@
+import { IsString, IsNotEmpty, MinLength } from 'class-validator';
+
+export class LoginDto {
+  @IsString()
+  @IsNotEmpty({ message: '아이디를 입력해주세요.' })
+  username: string;
+
+  @IsString()
+  @IsNotEmpty({ message: '비밀번호를 입력해주세요.' })
+  @MinLength(4, { message: '비밀번호는 최소 4자 이상이어야 합니다.' })
+  password: string;
+}

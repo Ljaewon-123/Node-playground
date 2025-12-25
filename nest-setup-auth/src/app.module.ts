@@ -5,6 +5,8 @@ import { validate } from './config/env.validation';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConnectionService } from './database/postgres.config';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { TypeOrmConnectionService } from './database/postgres.config';
       imports: [ConfigModule],
       useClass: TypeOrmConnectionService,
     }),
+    AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
