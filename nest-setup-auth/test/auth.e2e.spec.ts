@@ -5,7 +5,7 @@ import { AppModule } from '../src/app.module';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from 'src/user/entity/user.entity';
+import { User, UserRole } from 'src/user/entity/user.entity';
 
 // main.ts에 있던 설정을 그대로 가져옵니다.
 function setupSession(app: INestApplication) {

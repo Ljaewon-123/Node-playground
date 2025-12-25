@@ -16,6 +16,17 @@ services:
       timeout: 5s
       retries: 5
 
+  # [추가] E2E 테스트용 DB
+  test-db:
+    image: postgres:17-alpine
+    container_name: nestjs-db-test
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: test_db
+    ports:
+      - "5434:5432" # 개발용(5433)과 다른 포트 사용
+    # 테스트 DB는 데이터를 보존할 필요가 없으므로 볼륨 생략 가능 (테스트 때마다 초기화)
 
   api:
     build: 
