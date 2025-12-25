@@ -7,6 +7,7 @@ import { DataSource } from 'typeorm';
 // import pgSession from 'connect-pg-simple';
 import * as connectPgSimple from 'connect-pg-simple';
 import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 const HOUR_1 = 360_0000
 
@@ -56,6 +57,23 @@ async function bootstrap() {
       transform: true,
     }),
   )
+
+  const config = new DocumentBuilder()
+    .setTitle('과제 API 타이틀')
+    .setDescription('과제 설명 (예: 로그인 및 권한 관리 시스템)')
+    .setVersion('1.0')
+    .addCookieAuth('connect.sid') // 세션 쿠키 인증 사용 시 설정
+    .build();
+
+  const documentFactory = () => SwaggerModule.createDocument(app, config, { deepScanRoutes: true });
+  SwaggerModule.setup('api', app, documentFactory, {
+    swaggerOptions: {
+      persistAuthorization: true, // 인증 유지
+      displayRequestDuration: true, // API 응답 시간 표시 (성능 확인용 꿀팁)
+      filter: true, // API가 많아질 때 검색창 활성화
+    }
+  });
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
