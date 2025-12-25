@@ -1,6 +1,11 @@
 import { Controller, Post, UseGuards, Request, Get, HttpCode } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request as ExpressRequest } from 'express';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import { AuthenticatedGuard } from 'src/common/guards/authenticated.guard';
+import { Roles } from 'src/common/desorators/roles.decorator';
+import { UserRole } from 'src/user/entity/user.entity';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 // 1. 세션에 담길 유저 타입 정의
 interface AuthUser {
@@ -11,26 +16,18 @@ interface AuthUser {
 @Controller('auth')
 export class AuthController {
 
-  @UseGuards(AuthGuard('local'))
+  @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(200)
   async login(@Request() req: ExpressRequest) {
     const user = req.user as AuthUser;
-    // 가드가 성공하면 req.user는 이미 채워져 있습니다.
-    // 하지만 세션 생성을 위해 명시적으로 logIn을 호출합니다. (Passport가 제공하는 함수)
-    return new Promise((resolve, reject) => {
-      req.logIn(user, (err) => {
-        if (err) {
-          console.error('세션 생성 에러:', err);
-          return reject(err);
-        }
-        console.log('세션 생성 성공! DB를 확인하세요.');
-        return resolve({ message: '로그인 성공', user: req.user });
-      });
-    });
+    return { 
+      message: '로그인 성공', 
+      user 
+    };
   }
 
-  @Get('logout')
+  @Post('logout')
   logout(@Request() req: ExpressRequest) {
     // 1. 세션 파괴 (DB에서 해당 세션 삭제)
     req.session.destroy((err) => {
@@ -39,7 +36,7 @@ export class AuthController {
         console.error('세션 삭제 중 에러 발생:', err);
         return { message: '로그아웃 실패' };
       }
-    });
+  });
 
     // 2. 클라이언트의 쿠키 삭제 요청 (선택 사항이지만 권장)
     // 보통은 세션이 파괴되면 쿠키가 있어도 서버에서 인증이 안 되지만, 
@@ -47,9 +44,21 @@ export class AuthController {
     return { message: '로그아웃 성공' };
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Get('profile')
   getProfile(@Request() req : ExpressRequest) {
-    if (!req.isAuthenticated()) return { message: '로그인 필요' };
     return req.user;
+  }
+
+  @Get('admin-only')
+  @UseGuards(AuthenticatedGuard, RolesGuard) // 1. 로그인 확인 -> 2. 권한 확인
+  @Roles(UserRole.ADMIN) // admin 역할만 허용
+  getAdminData() {
+    return { message: '어드민 전용 데이터입니다.' };
+  }
+
+  @Get('public')
+  notNeedLogin() {
+    return { message: '로그인 없어도 가능.' };
   }
 }
